@@ -7,7 +7,7 @@ import dev.gfxv.lab1.dto.LoginDTO;
 import dev.gfxv.lab1.dto.RegisterDTO;
 import dev.gfxv.lab1.repository.RoleRepository;
 import dev.gfxv.lab1.repository.UserRepository;
-import dev.gfxv.lab1.security.JWTGenerator;
+import dev.gfxv.lab1.security.JwtProvider;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ public class AuthController {
     final UserRepository userRepository;
     final RoleRepository roleRepository;
     final PasswordEncoder passwordEncoder;
-    final JWTGenerator jwtGenerator;
+    final JwtProvider jwtProvider;
 
     @Autowired
     public AuthController(
@@ -42,13 +42,13 @@ public class AuthController {
         UserRepository userRepository,
         RoleRepository roleRepository,
         PasswordEncoder passwordEncoder,
-        JWTGenerator jwtGenerator
+        JwtProvider jwtProvider
     ) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.jwtGenerator = jwtGenerator;
+        this.jwtProvider = jwtProvider;
     }
 
 
@@ -60,7 +60,7 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtGenerator.generateToken(authentication);
+        String token = jwtProvider.generateToken(authentication);
         return new ResponseEntity<>(new AuthResponseDTO(token), HttpStatus.OK);
     }
 
