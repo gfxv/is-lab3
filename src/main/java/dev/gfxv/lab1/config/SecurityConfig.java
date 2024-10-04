@@ -1,10 +1,7 @@
 package dev.gfxv.lab1.config;
 
 
-import dev.gfxv.lab1.security.CustomUserDetailsService;
-import dev.gfxv.lab1.security.JWTAuthenticationFilter;
-import dev.gfxv.lab1.security.JwtAuthEntryPoint;
-import dev.gfxv.lab1.security.SHA512Encoder;
+import dev.gfxv.lab1.security.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,13 +21,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAuthEntryPoint authEntryPoint;
     private final CustomUserDetailsService userDetailsService;
+    private final JwtProvider jwtTokenProvider;
 
     @Autowired
-    public SecurityConfig(CustomUserDetailsService userDetailsService, JwtAuthEntryPoint authEntryPoint) {
+    public SecurityConfig(
+        CustomUserDetailsService userDetailsService,
+        JwtProvider jwtTokenProvider
+    ) {
         this.userDetailsService = userDetailsService;
-        this.authEntryPoint = authEntryPoint;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Bean
@@ -44,7 +44,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
 
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, userDetailsService), UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
     }
@@ -59,11 +60,6 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new SHA512Encoder();
-    }
-
-    @Bean
-    public JWTAuthenticationFilter jwtAuthenticationFilter() {
-        return new JWTAuthenticationFilter();
     }
 
 //    @Bean
