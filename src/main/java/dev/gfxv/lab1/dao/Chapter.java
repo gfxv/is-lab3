@@ -14,10 +14,10 @@ public class Chapter {
     @Id
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "sequence-generator"
+            generator = "chapter-sequence-generator"
     )
     @SequenceGenerator(
-            name = "sequence-generator",
+            name = "chapter-sequence-generator",
             sequenceName = "chapter_id_seq",
             allocationSize=1
     )
