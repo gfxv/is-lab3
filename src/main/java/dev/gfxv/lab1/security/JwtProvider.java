@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Function;
 
 @Component
 public class JwtProvider {
@@ -43,7 +40,7 @@ public class JwtProvider {
         return token;
     }
 
-    public String getUsernameFromJWT(String token){
+    public String getUsernameFromJwt(String token){
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
