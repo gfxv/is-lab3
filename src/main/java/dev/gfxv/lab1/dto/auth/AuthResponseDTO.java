@@ -1,4 +1,4 @@
-package dev.gfxv.lab1.dto;
+package dev.gfxv.lab1.dto.auth;
 
 import lombok.AccessLevel;
 import lombok.Data;
