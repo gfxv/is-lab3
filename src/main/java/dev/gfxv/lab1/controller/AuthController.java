@@ -2,9 +2,9 @@ package dev.gfxv.lab1.controller;
 
 import dev.gfxv.lab1.dao.RoleDAO;
 import dev.gfxv.lab1.dao.UserDAO;
-import dev.gfxv.lab1.dto.AuthResponseDTO;
-import dev.gfxv.lab1.dto.LoginDTO;
-import dev.gfxv.lab1.dto.RegisterDTO;
+import dev.gfxv.lab1.dto.auth.AuthResponseDTO;
+import dev.gfxv.lab1.dto.auth.LoginDTO;
+import dev.gfxv.lab1.dto.auth.RegisterDTO;
 import dev.gfxv.lab1.repository.RoleRepository;
 import dev.gfxv.lab1.repository.UserRepository;
 import dev.gfxv.lab1.security.JwtProvider;
@@ -18,13 +18,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/auth")
 @FieldDefaults(level = AccessLevel.PRIVATE)
