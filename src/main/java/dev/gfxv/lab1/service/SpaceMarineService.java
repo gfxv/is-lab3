@@ -1,32 +1,49 @@
 package dev.gfxv.lab1.service;
 
+import dev.gfxv.lab1.dao.ChapterDAO;
+import dev.gfxv.lab1.dao.CoordinatesDAO;
 import dev.gfxv.lab1.dao.SpaceMarineDAO;
 import dev.gfxv.lab1.dao.UserDAO;
+import dev.gfxv.lab1.dto.ChapterDTO;
+import dev.gfxv.lab1.dto.CoordinatesDTO;
 import dev.gfxv.lab1.dto.SpaceMarineDTO;
 import dev.gfxv.lab1.exceptions.UserNotFoundException;
+import dev.gfxv.lab1.repository.ChapterRepository;
+import dev.gfxv.lab1.repository.CoordinateRepository;
 import dev.gfxv.lab1.repository.SpaceMarineRepository;
 import dev.gfxv.lab1.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SpaceMarineService {
 
-    final SpaceMarineRepository spaceMarineRepository;
-    final UserRepository userRepository;
+    SpaceMarineRepository spaceMarineRepository;
+    CoordinateRepository coordinateRepository;
+    ChapterRepository chapterRepository;
+    UserRepository userRepository;
 
     @Autowired
     public SpaceMarineService(
         SpaceMarineRepository spaceMarineRepository,
+        CoordinateRepository coordinateRepository,
+        ChapterRepository chapterRepository,
         UserRepository userRepository
     ) {
         this.spaceMarineRepository = spaceMarineRepository;
+        this.coordinateRepository = coordinateRepository;
+        this.chapterRepository = chapterRepository;
         this.userRepository = userRepository;
     }
 
@@ -42,7 +59,45 @@ public class SpaceMarineService {
             throw new UserNotFoundException("username not found");
         }
         spaceMarine.setUser(user.get());
+
+        // ДАЛЬШЕ БОГА НЕТ
+
+        // check if coordinate exists, create if not
+        CoordinatesDAO coordinate;
+        CoordinatesDTO coordinateDTO = spaceMarineDTO.getCoordinates();
+        Optional<CoordinatesDAO> foundCoordinate = coordinateRepository.findByXAndY(coordinateDTO.getX(), coordinateDTO.getY());
+        if (foundCoordinate.isEmpty()) {
+            coordinate = coordinateRepository.save(CoordinatesDTO.toDAO(coordinateDTO));
+            spaceMarine.setCoordinates(coordinate);
+        } else {
+            spaceMarine.setCoordinates(foundCoordinate.get());
+        }
+
+        // check if chapter exists, create if not
+        ChapterDAO chapter;
+        ChapterDTO chapterDTO = spaceMarineDTO.getChapter();
+        Optional<ChapterDAO> foundChapter = chapterRepository
+                .findByNameAndParentLegionAndMarinesCountAndWorld(
+                        chapterDTO.getName(),
+                        chapterDTO.getParentLegion(),
+                        chapterDTO.getMarinesCount(),
+                        chapterDTO.getWorld()
+                );
+        if (foundChapter.isEmpty()) {
+            chapter = chapterRepository.save(ChapterDTO.toDAO(chapterDTO));
+            spaceMarine.setChapter(chapter);
+        } else {
+            spaceMarine.setChapter(foundChapter.get());
+        }
+
         spaceMarineRepository.save(spaceMarine);
     }
 
+    public List<SpaceMarineDTO> getAllMarinesAsPage(int page, int size) {
+        Pageable paging = PageRequest.of(page, size);
+        return spaceMarineRepository.findAll(paging)
+                .get()
+                .map(SpaceMarineDTO::fromDAO)
+                .toList();
+    }
 }
