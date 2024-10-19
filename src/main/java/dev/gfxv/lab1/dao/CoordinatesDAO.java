@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @Entity
-@Table(name = "users")
+@Table(name = "coordinates")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CoordinatesDAO {
     @Id
@@ -22,10 +22,10 @@ public class CoordinatesDAO {
     )
     Long id;
 
-    @Column
+    @Column(name = "x")
     Integer x;
 
-    @Column
+    @Column(name = "y")
     Long y;
 
 }

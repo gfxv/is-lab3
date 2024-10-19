@@ -32,15 +32,20 @@ public class SpaceMarineDAO {
     @Column(columnDefinition = "NOT NULL CHECK ( length(name) > 0 )")
     String name;
 
-    @Column(nullable = false)
+    @Column(name = "creation_date", nullable = false)
     LocalDate creationDate;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "CHECK ( health > 0 )")
     Integer health;
 
+    @Column(nullable = false)
+    Long height;
+
+    @Column(name = "weapon")
     @Enumerated(EnumType.STRING)
     Weapon weapon;
 
+    @Column(name = "melee_weapon")
     @Enumerated(EnumType.STRING)
     MeleeWeapon meleeWeapon;
 
