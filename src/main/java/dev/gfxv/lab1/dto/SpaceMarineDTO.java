@@ -24,6 +24,7 @@ public class SpaceMarineDTO {
     String name;
     LocalDate creationDate;
     Integer health;
+    Long height;
     Weapon weapon;
     MeleeWeapon meleeWeapon;
     CoordinatesDTO coordinates;
@@ -35,6 +36,7 @@ public class SpaceMarineDTO {
                 .name(spaceMarineDAO.getName())
                 .creationDate(spaceMarineDAO.getCreationDate())
                 .health(spaceMarineDAO.getHealth())
+                .height(spaceMarineDAO.getHeight())
                 .weapon(spaceMarineDAO.getWeapon())
                 .meleeWeapon(spaceMarineDAO.getMeleeWeapon())
                 .coordinates(CoordinatesDTO.fromDAO(spaceMarineDAO.getCoordinates()))
@@ -47,6 +49,7 @@ public class SpaceMarineDTO {
         dao.setName(dto.getName());
         dao.setCreationDate(dto.getCreationDate());
         dao.setHealth(dto.getHealth());
+        dao.setHeight(dto.getHeight());
         dao.setWeapon(dto.getWeapon());
         dao.setMeleeWeapon(dto.getMeleeWeapon());
         dao.setCoordinates(CoordinatesDTO.toDAO(dto.getCoordinates()));
