@@ -3,6 +3,7 @@ package dev.gfxv.lab1.dto;
 import dev.gfxv.lab1.dao.ChapterDAO;
 import dev.gfxv.lab1.dao.CoordinatesDAO;
 import dev.gfxv.lab1.dao.SpaceMarineDAO;
+import dev.gfxv.lab1.dao.UserDAO;
 import dev.gfxv.lab1.dao.enums.MeleeWeapon;
 import dev.gfxv.lab1.dao.enums.Weapon;
 import jakarta.persistence.*;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SpaceMarineDTO {
+    Long id;
     String name;
     LocalDate creationDate;
     Integer health;
@@ -29,10 +31,12 @@ public class SpaceMarineDTO {
     MeleeWeapon meleeWeapon;
     CoordinatesDTO coordinates;
     ChapterDTO chapter;
+    UserDTO owner;
 
     public static SpaceMarineDTO fromDAO(SpaceMarineDAO spaceMarineDAO) {
         return SpaceMarineDTO
                 .builder()
+                .id(spaceMarineDAO.getId())
                 .name(spaceMarineDAO.getName())
                 .creationDate(spaceMarineDAO.getCreationDate())
                 .health(spaceMarineDAO.getHealth())
@@ -41,6 +45,7 @@ public class SpaceMarineDTO {
                 .meleeWeapon(spaceMarineDAO.getMeleeWeapon())
                 .coordinates(CoordinatesDTO.fromDAO(spaceMarineDAO.getCoordinates()))
                 .chapter(ChapterDTO.fromDAO(spaceMarineDAO.getChapter()))
+                .owner(UserDTO.fromDAO(spaceMarineDAO.getUser()))
                 .build();
     }
 

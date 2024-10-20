@@ -11,11 +11,13 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CoordinatesDTO {
+    Long id;
     Integer x;
     Long y;
 
     public static CoordinatesDTO fromDAO(CoordinatesDAO coordinatesDAO){
         return CoordinatesDTO.builder()
+                .id(coordinatesDAO.getId())
                 .x(coordinatesDAO.getX())
                 .y(coordinatesDAO.getY())
                 .build();

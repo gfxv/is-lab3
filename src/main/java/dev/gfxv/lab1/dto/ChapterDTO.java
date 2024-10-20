@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChapterDTO {
+    Long id;
     String name;
     String parentLegion;
     Integer marinesCount;
@@ -17,6 +18,7 @@ public class ChapterDTO {
 
     public static ChapterDTO fromDAO(ChapterDAO dao) {
         return ChapterDTO.builder()
+                .id(dao.getId())
                 .name(dao.getName())
                 .parentLegion(dao.getParentLegion())
                 .marinesCount(dao.getMarinesCount())

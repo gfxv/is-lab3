@@ -21,18 +21,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/api/auth")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
 
-    final AuthenticationManager authenticationManager;
-    final UserRepository userRepository;
-    final RoleRepository roleRepository;
-    final PasswordEncoder passwordEncoder;
-    final JwtProvider jwtProvider;
+    AuthenticationManager authenticationManager;
+    UserRepository userRepository;
+    RoleRepository roleRepository;
+    PasswordEncoder passwordEncoder;
+    JwtProvider jwtProvider;
 
     @Autowired
     public AuthController(
@@ -43,7 +44,7 @@ public class AuthController {
         JwtProvider jwtProvider
     ) {
         this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
+        this.userRepository = userRepository; // TODO: move to service layer
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtProvider = jwtProvider;
@@ -73,14 +74,11 @@ public class AuthController {
         user.setUsername(registerDTO.getUsername());
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
 
-        RoleDAO roles = roleRepository.findByName("USER").get(); // no need to check ifPresent(), USER is a 'built-in' role
+        RoleDAO roles = roleRepository.findByName("USER").get(); // NOTE: no need to check ifPresent(), USER is a 'built-in' role
         user.setRoles(Collections.singletonList(roles));
 
         userRepository.save(user);
 
         return new ResponseEntity<>("User registered success!", HttpStatus.OK);
     }
-
-
-
 }

@@ -14,17 +14,20 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDTO {
 
+    Long id;
     String username;
-
     List<String> roles; // ?
 
     public static UserDTO fromDAO(UserDAO userDAO) {
         return UserDTO.builder()
+                .id(userDAO.getId())
                 .username(userDAO.getUsername())
                 .roles(userDAO.getRoles().stream()
                         .map(RoleDAO::getName).toList())
                 .build();
     }
+
+
 
 
 }

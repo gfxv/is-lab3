@@ -9,5 +9,4 @@ public enum ResponseType {
     ADD,
     UPDATE,
     DELETE,
-    ERROR
 }
