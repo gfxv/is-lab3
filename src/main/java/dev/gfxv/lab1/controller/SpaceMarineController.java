@@ -11,6 +11,7 @@ import dev.gfxv.lab1.exceptions.UserNotFoundException;
 import dev.gfxv.lab1.security.JwtProvider;
 import dev.gfxv.lab1.service.SpaceMarineService;
 import lombok.AccessLevel;
+import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -106,6 +107,18 @@ public class SpaceMarineController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteMarine(
+        @PathVariable Long id
+    ) {
+        try {
+            spaceMarineService.deleteMarineById(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping("/count")

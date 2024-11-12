@@ -112,6 +112,14 @@ public class SpaceMarineService {
         spaceMarineRepository.save(spaceMarine);
     }
 
+    public void deleteMarineById(Long id) throws NotFoundException {
+        Optional<SpaceMarineDAO> marine = spaceMarineRepository.findById(id);
+        if (marine.isEmpty()) {
+            throw new NotFoundException("Space Marine not found");
+        }
+        spaceMarineRepository.deleteById(id);
+    }
+
     public List<SpaceMarineDTO> getAllMarinesAsPage(int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         return spaceMarineRepository.findAll(paging)
