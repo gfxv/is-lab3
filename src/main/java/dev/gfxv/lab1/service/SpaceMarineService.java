@@ -54,6 +54,18 @@ public class SpaceMarineService {
         return SpaceMarineDTO.fromDAO(marine.get());
     }
 
+    public void updateMarine(SpaceMarineDTO marine) throws NotFoundException {
+        // TODO: add record to 'changes' table
+
+        Optional<SpaceMarineDAO> marineOptional = spaceMarineRepository.findById(marine.getId());
+        if (marineOptional.isEmpty()) {
+            throw new NotFoundException("Marine not found");
+        }
+        SpaceMarineDAO updatedMarine = SpaceMarineDTO.toDAO(marine);
+        updatedMarine.setUser(marineOptional.get().getUser());
+        spaceMarineRepository.save(updatedMarine);
+    }
+
     public void newMarine(SpaceMarineDTO spaceMarineDTO, String owner) throws UserNotFoundException {
         final String op = "SpaceMarineService";
         System.out.printf("[%s] Received: %s\n", op, spaceMarineDTO);

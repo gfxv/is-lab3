@@ -96,6 +96,18 @@ public class SpaceMarineController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PutMapping()
+    public ResponseEntity<?> updateMarine(
+        @RequestBody SpaceMarineDTO spaceMarineDTO
+    ) {
+        try {
+            spaceMarineService.updateMarine(spaceMarineDTO);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @GetMapping("/count")
     public ResponseEntity<?> countMarines() {
         return new ResponseEntity<>(spaceMarineService.countMarines(), HttpStatus.OK);
