@@ -25,6 +25,9 @@ public class CoordinatesDTO {
 
     public static CoordinatesDAO toDAO(CoordinatesDTO dto) {
         CoordinatesDAO dao = new CoordinatesDAO();
+        if (dto.getId() != null) {
+            dao.setId(dto.getId());
+        }
         dao.setX(dto.getX());
         dao.setY(dto.getY());
         return dao;

@@ -28,6 +28,9 @@ public class ChapterDTO {
 
     public static ChapterDAO toDAO(ChapterDTO dto) {
         ChapterDAO dao = new ChapterDAO();
+        if (dto.getId() != null) {
+            dao.setId(dto.getId());
+        }
         dao.setName(dto.getName());
         dao.setParentLegion(dto.getParentLegion());
         dao.setMarinesCount(dto.getMarinesCount());

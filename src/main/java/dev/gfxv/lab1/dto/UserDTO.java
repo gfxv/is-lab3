@@ -26,8 +26,4 @@ public class UserDTO {
                         .map(RoleDAO::getName).toList())
                 .build();
     }
-
-
-
-
 }

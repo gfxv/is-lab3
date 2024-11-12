@@ -51,6 +51,9 @@ public class SpaceMarineDTO {
 
     public static SpaceMarineDAO toDAO(SpaceMarineDTO dto) {
         SpaceMarineDAO dao = new SpaceMarineDAO();
+        if (dto.getId() != null) {
+            dao.setId(dto.getId());
+        }
         dao.setName(dto.getName());
         dao.setCreationDate(dto.getCreationDate());
         dao.setHealth(dto.getHealth());
