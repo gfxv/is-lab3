@@ -7,6 +7,7 @@ import dev.gfxv.lab1.dao.UserDAO;
 import dev.gfxv.lab1.dto.ChapterDTO;
 import dev.gfxv.lab1.dto.CoordinatesDTO;
 import dev.gfxv.lab1.dto.SpaceMarineDTO;
+import dev.gfxv.lab1.exceptions.NotFoundException;
 import dev.gfxv.lab1.exceptions.UserNotFoundException;
 import dev.gfxv.lab1.repository.ChapterRepository;
 import dev.gfxv.lab1.repository.CoordinateRepository;
@@ -43,6 +44,14 @@ public class SpaceMarineService {
         this.coordinateRepository = coordinateRepository;
         this.chapterRepository = chapterRepository;
         this.userRepository = userRepository;
+    }
+
+    public SpaceMarineDTO getMarineById(Long id) throws NotFoundException {
+        Optional<SpaceMarineDAO> marine = spaceMarineRepository.findById(id);
+        if (marine.isEmpty()) {
+            throw new NotFoundException("Space Marine not found");
+        }
+        return SpaceMarineDTO.fromDAO(marine.get());
     }
 
     public void newMarine(SpaceMarineDTO spaceMarineDTO, String owner) throws UserNotFoundException {

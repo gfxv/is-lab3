@@ -6,6 +6,7 @@ import dev.gfxv.lab1.dao.enums.Weapon;
 import dev.gfxv.lab1.dto.SpaceMarineDTO;
 import dev.gfxv.lab1.dto.ws.ResponseType;
 import dev.gfxv.lab1.dto.ws.TableRecordsResponse;
+import dev.gfxv.lab1.exceptions.NotFoundException;
 import dev.gfxv.lab1.exceptions.UserNotFoundException;
 import dev.gfxv.lab1.security.JwtProvider;
 import dev.gfxv.lab1.service.SpaceMarineService;
@@ -43,6 +44,18 @@ public class SpaceMarineController {
         this.spaceMarineService = spaceMarineService;
         this.messagingTemplate = messagingTemplate;
         this.jwtProvider = jwtProvider;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getMarineById(
+        @PathVariable Long id
+    ) {
+        try {
+            SpaceMarineDTO marine = spaceMarineService.getMarineById(id);
+            return new ResponseEntity<>(marine, HttpStatus.OK);
+        } catch (NotFoundException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        }
     }
 
 
