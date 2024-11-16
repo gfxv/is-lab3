@@ -9,9 +9,10 @@ import dev.gfxv.lab1.dto.ws.TableRecordsResponse;
 import dev.gfxv.lab1.exceptions.NotFoundException;
 import dev.gfxv.lab1.exceptions.UserNotFoundException;
 import dev.gfxv.lab1.security.JwtProvider;
+import dev.gfxv.lab1.service.AdminService;
 import dev.gfxv.lab1.service.SpaceMarineService;
+import dev.gfxv.lab1.service.UserService;
 import lombok.AccessLevel;
-import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +33,7 @@ public class SpaceMarineController {
     int maxPageSize = 10;
 
     SpaceMarineService spaceMarineService;
+    UserService userService;
 
     SimpMessagingTemplate messagingTemplate;
     JwtProvider jwtProvider;
@@ -39,10 +41,12 @@ public class SpaceMarineController {
     @Autowired
     public SpaceMarineController(
         SpaceMarineService spaceMarineService,
+        UserService userService,
         SimpMessagingTemplate messagingTemplate,
         JwtProvider jwtProvider
     ) {
         this.spaceMarineService = spaceMarineService;
+        this.userService = userService;
         this.messagingTemplate = messagingTemplate;
         this.jwtProvider = jwtProvider;
     }
@@ -120,6 +124,33 @@ public class SpaceMarineController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
     }
+
+    @GetMapping("/has-access/{marineId}")
+    public ResponseEntity<?> hasAccess(
+        @RequestHeader("Authorization") String tokenHeader,
+        @PathVariable String marineId
+    ) {
+        String token = JwtParser.parseTokenFromHeader(tokenHeader);
+        String username = jwtProvider.getUsernameFromJwt(token);
+
+        System.out.println("Checking user: " + username);
+
+        // check if user is Admin
+        if (userService.isAdmin(username)) {
+            System.out.printf("User %s is an admin\n", username);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        }
+
+        // check is user is Owner
+        if (userService.userHasAccess(username, Long.parseLong(marineId))) {
+            System.out.printf("User %s is an owner\n", username);
+            return new ResponseEntity<>(true, HttpStatus.OK);
+        }
+
+        System.out.printf("User %s has no access to marine %s\n", username, marineId);
+        return new ResponseEntity<>(false, HttpStatus.OK);
+    }
+
 
     @GetMapping("/count")
     public ResponseEntity<?> countMarines() {
