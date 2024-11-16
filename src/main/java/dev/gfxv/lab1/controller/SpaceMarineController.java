@@ -7,6 +7,7 @@ import dev.gfxv.lab1.dto.SpaceMarineDTO;
 import dev.gfxv.lab1.dto.ws.ResponseType;
 import dev.gfxv.lab1.dto.ws.TableRecordsResponse;
 import dev.gfxv.lab1.exceptions.NotFoundException;
+import dev.gfxv.lab1.exceptions.PermissionDeniedException;
 import dev.gfxv.lab1.exceptions.UserNotFoundException;
 import dev.gfxv.lab1.security.JwtProvider;
 import dev.gfxv.lab1.service.AdminService;
@@ -113,13 +114,23 @@ public class SpaceMarineController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{marineId}")
     public ResponseEntity<?> deleteMarine(
-        @PathVariable Long id
+        @RequestHeader("Authorization") String tokenHeader,
+        @PathVariable String marineId
     ) {
+        String token = JwtParser.parseTokenFromHeader(tokenHeader);
+        String username = jwtProvider.getUsernameFromJwt(token);
+
         try {
-            spaceMarineService.deleteMarineById(id);
+            Long id = Long.parseLong(marineId);
+            if (!userService.validateDeletePermission(username, id)) {
+                return new ResponseEntity<>("Permission Denied", HttpStatus.FORBIDDEN);
+            }
+            spaceMarineService.deleteMarineById(Long.parseLong(marineId));
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
@@ -133,22 +144,12 @@ public class SpaceMarineController {
         String token = JwtParser.parseTokenFromHeader(tokenHeader);
         String username = jwtProvider.getUsernameFromJwt(token);
 
-        System.out.println("Checking user: " + username);
-
-        // check if user is Admin
-        if (userService.isAdmin(username)) {
-            System.out.printf("User %s is an admin\n", username);
-            return new ResponseEntity<>(true, HttpStatus.OK);
+        try {
+            Long id = Long.parseLong(marineId);
+            return new ResponseEntity<>(userService.validateDeletePermission(username, id), HttpStatus.OK);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-
-        // check is user is Owner
-        if (userService.userHasAccess(username, Long.parseLong(marineId))) {
-            System.out.printf("User %s is an owner\n", username);
-            return new ResponseEntity<>(true, HttpStatus.OK);
-        }
-
-        System.out.printf("User %s has no access to marine %s\n", username, marineId);
-        return new ResponseEntity<>(false, HttpStatus.OK);
     }
 
 

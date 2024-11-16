@@ -7,6 +7,8 @@ import dev.gfxv.lab1.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -57,4 +59,9 @@ public class UserService {
         }
         return spaceMarine.get().getUser().equals(user.get());
     }
+
+    public boolean validateDeletePermission(String username, Long marineId) {
+        return userHasAccess(username, marineId) || isAdmin(username);
+    }
+
 }
