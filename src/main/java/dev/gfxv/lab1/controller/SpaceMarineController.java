@@ -7,10 +7,8 @@ import dev.gfxv.lab1.dto.SpaceMarineDTO;
 import dev.gfxv.lab1.dto.ws.ResponseType;
 import dev.gfxv.lab1.dto.ws.TableRecordsResponse;
 import dev.gfxv.lab1.exceptions.NotFoundException;
-import dev.gfxv.lab1.exceptions.PermissionDeniedException;
 import dev.gfxv.lab1.exceptions.UserNotFoundException;
 import dev.gfxv.lab1.security.JwtProvider;
-import dev.gfxv.lab1.service.AdminService;
 import dev.gfxv.lab1.service.SpaceMarineService;
 import dev.gfxv.lab1.service.UserService;
 import lombok.AccessLevel;
@@ -92,8 +90,6 @@ public class SpaceMarineController {
         }
 
         List<SpaceMarineDTO> marines = spaceMarineService.getAllMarinesAsPage(page, size);
-        System.out.println("Marines to be sent: " + marines);
-
         TableRecordsResponse response = TableRecordsResponse.builder()
                 .type(ResponseType.GET)
                 .records(marines)
