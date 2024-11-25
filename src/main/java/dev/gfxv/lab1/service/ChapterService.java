@@ -37,6 +37,7 @@ public class ChapterService {
         return spaceMarineRepository.findAllByUserUsername(username)
                 .stream()
                 .map(dao -> ChapterDTO.fromDAO(dao.getChapter()))
+                .distinct()
                 .toList();
     }
 }

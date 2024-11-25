@@ -2,6 +2,7 @@ package dev.gfxv.lab1.service;
 
 import dev.gfxv.lab1.dao.SpaceMarineDAO;
 import dev.gfxv.lab1.dao.UserDAO;
+import dev.gfxv.lab1.exceptions.UserNotFoundException;
 import dev.gfxv.lab1.repository.SpaceMarineRepository;
 import dev.gfxv.lab1.repository.UserRepository;
 import lombok.AccessLevel;
@@ -46,6 +47,12 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("username '%s' not found", username)))
                 .getRoles().stream()
                 .anyMatch(userRole -> userRole.getName().equals(ADMIN_ROLE));
+    }
+
+    public Long getIdByUsername(String username) throws UserNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException(String.format("username '%s' not found", username)))
+                .getId();
     }
 
     public boolean userHasAccess(String username, Long marineId) {

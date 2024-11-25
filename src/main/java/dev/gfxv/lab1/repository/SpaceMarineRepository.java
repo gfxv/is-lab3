@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface SpaceMarineRepository extends JpaRepository<SpaceMarineDAO, Long> {
     List<SpaceMarineDAO> findAllByUserUsername(String name);
+    void deleteAllByChapterIdAndUserId(Long chapterId, Long userId);
 }

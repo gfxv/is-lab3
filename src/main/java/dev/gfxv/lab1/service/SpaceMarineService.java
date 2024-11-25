@@ -13,6 +13,7 @@ import dev.gfxv.lab1.repository.ChapterRepository;
 import dev.gfxv.lab1.repository.CoordinateRepository;
 import dev.gfxv.lab1.repository.SpaceMarineRepository;
 import dev.gfxv.lab1.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -118,6 +120,11 @@ public class SpaceMarineService {
             throw new NotFoundException("Space Marine not found");
         }
         spaceMarineRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteMarineByChapterForUser(Long chapterId, Long userId) {
+        spaceMarineRepository.deleteAllByChapterIdAndUserId(chapterId, userId);
     }
 
     public List<SpaceMarineDTO> getAllMarinesAsPage(int page, int size) {
