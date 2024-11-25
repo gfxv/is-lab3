@@ -122,17 +122,22 @@ public class SpaceMarineService {
         spaceMarineRepository.deleteById(id);
     }
 
-    @Transactional
-    public void deleteMarineByChapterForUser(Long chapterId, Long userId) {
-        spaceMarineRepository.deleteAllByChapterIdAndUserId(chapterId, userId);
-    }
-
     public List<SpaceMarineDTO> getAllMarinesAsPage(int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         return spaceMarineRepository.findAll(paging)
                 .get()
                 .map(SpaceMarineDTO::fromDAO)
                 .toList();
+    }
+
+    @Transactional
+    public void deleteMarineByChapterForUser(Long chapterId, Long userId) {
+        spaceMarineRepository.deleteAllByChapterIdAndUserId(chapterId, userId);
+    }
+
+    @Transactional
+    public void deleteMarineByCoordinateForUser(Long coordinateId, Long userId) {
+        spaceMarineRepository.deleteAllByCoordinatesIdAndUserId(coordinateId, userId);
     }
 
     public long countMarines() {
