@@ -4,6 +4,7 @@ import dev.gfxv.lab1.dao.ChapterDAO;
 import dev.gfxv.lab1.dao.CoordinatesDAO;
 import dev.gfxv.lab1.dao.SpaceMarineDAO;
 import dev.gfxv.lab1.dao.UserDAO;
+import dev.gfxv.lab1.dao.enums.Weapon;
 import dev.gfxv.lab1.dto.ChapterDTO;
 import dev.gfxv.lab1.dto.CoordinatesDTO;
 import dev.gfxv.lab1.dto.SpaceMarineDTO;
@@ -23,7 +24,9 @@ import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -128,6 +131,23 @@ public class SpaceMarineService {
                 .get()
                 .map(SpaceMarineDTO::fromDAO)
                 .toList();
+    }
+
+    public Map<String, List<SpaceMarineDTO>> getAggregated() {
+        Map<String, List<SpaceMarineDTO>> aggregated = new HashMap<>();
+        Weapon[] weapons = Weapon.values();
+        for (Weapon weapon : weapons) {
+            List<SpaceMarineDTO> marines = spaceMarineRepository.findAllByWeapon(weapon)
+                    .stream()
+                    .map(SpaceMarineDTO::fromDAO)
+                    .toList();
+            aggregated.put(weapon.getName(), marines);
+        }
+        return aggregated;
+    }
+
+    public int countMarinesWithHeight(Long height) {
+        return spaceMarineRepository.countAllByHeight(height);
     }
 
     @Transactional

@@ -12,8 +12,10 @@ import dev.gfxv.lab1.security.JwtProvider;
 import dev.gfxv.lab1.service.SpaceMarineService;
 import dev.gfxv.lab1.service.UserService;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -96,6 +98,24 @@ public class SpaceMarineController {
                 .build();
         messagingTemplate.convertAndSend("/records/changes", response);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/by-weapon")
+    public ResponseEntity<?> getAggregated() {
+        var aggregated = spaceMarineService.getAggregated();
+        return new ResponseEntity<>(aggregated, HttpStatus.OK);
+    }
+
+    @GetMapping("/count-height")
+    public ResponseEntity<?> getAggregatedWithHeight(
+        @RequestParam String height
+    ) {
+        try {
+            int result = spaceMarineService.countMarinesWithHeight(Long.parseLong(height));
+            return new ResponseEntity<>(result, HttpStatus.OK);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping()
