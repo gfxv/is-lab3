@@ -15,4 +15,5 @@ public interface ChapterRepository extends JpaRepository<ChapterDAO, Long> {
             Integer marinesCount,
             String world
     );
+    Optional<ChapterDAO> findByName(String name);
 }

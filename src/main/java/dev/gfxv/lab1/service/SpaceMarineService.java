@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.beans.Transient;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -30,6 +29,8 @@ public class SpaceMarineService {
     CoordinateRepository coordinateRepository;
     ChapterRepository chapterRepository;
     UserRepository userRepository;
+
+    String noChapterName = "No Chapter";
 
     @Autowired
     public SpaceMarineService(
@@ -55,12 +56,17 @@ public class SpaceMarineService {
     }
 
     public void updateMarine(SpaceMarineDTO marine, String editorUsername) throws NotFoundException {
-        // TODO: add record to 'changes' table
-
         Optional<SpaceMarineDAO> marineOptional = spaceMarineRepository.findById(marine.getId());
         if (marineOptional.isEmpty()) {
             throw new NotFoundException("Marine not found");
         }
+
+        if (marine.getChapter() == null) {
+            ChapterDAO noChapter = chapterRepository.findByName(noChapterName)
+                    .orElseThrow(() -> new NotFoundException("No Empty Chapter"));
+            marine.setChapter(ChapterDTO.fromDAO(noChapter));
+        }
+
         SpaceMarineDAO updatedMarine = SpaceMarineDTO.toDAO(marine);
         updatedMarine.setUser(marineOptional.get().getUser());
 
