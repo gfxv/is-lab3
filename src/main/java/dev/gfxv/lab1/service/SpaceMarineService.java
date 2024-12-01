@@ -1,19 +1,14 @@
 package dev.gfxv.lab1.service;
 
-import dev.gfxv.lab1.dao.ChapterDAO;
-import dev.gfxv.lab1.dao.CoordinatesDAO;
-import dev.gfxv.lab1.dao.SpaceMarineDAO;
-import dev.gfxv.lab1.dao.UserDAO;
+import dev.gfxv.lab1.dao.*;
 import dev.gfxv.lab1.dao.enums.Weapon;
 import dev.gfxv.lab1.dto.ChapterDTO;
 import dev.gfxv.lab1.dto.CoordinatesDTO;
+import dev.gfxv.lab1.dto.EditHistoryDTO;
 import dev.gfxv.lab1.dto.SpaceMarineDTO;
 import dev.gfxv.lab1.exceptions.NotFoundException;
 import dev.gfxv.lab1.exceptions.UserNotFoundException;
-import dev.gfxv.lab1.repository.ChapterRepository;
-import dev.gfxv.lab1.repository.CoordinateRepository;
-import dev.gfxv.lab1.repository.SpaceMarineRepository;
-import dev.gfxv.lab1.repository.UserRepository;
+import dev.gfxv.lab1.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -24,16 +19,14 @@ import org.springframework.stereotype.Service;
 
 import java.beans.Transient;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SpaceMarineService {
 
     SpaceMarineRepository spaceMarineRepository;
+    EditHistoryRepository editHistoryRepository;
     CoordinateRepository coordinateRepository;
     ChapterRepository chapterRepository;
     UserRepository userRepository;
@@ -41,11 +34,13 @@ public class SpaceMarineService {
     @Autowired
     public SpaceMarineService(
         SpaceMarineRepository spaceMarineRepository,
+        EditHistoryRepository editHistoryRepository,
         CoordinateRepository coordinateRepository,
         ChapterRepository chapterRepository,
         UserRepository userRepository
     ) {
         this.spaceMarineRepository = spaceMarineRepository;
+        this.editHistoryRepository = editHistoryRepository;
         this.coordinateRepository = coordinateRepository;
         this.chapterRepository = chapterRepository;
         this.userRepository = userRepository;
@@ -59,7 +54,7 @@ public class SpaceMarineService {
         return SpaceMarineDTO.fromDAO(marine.get());
     }
 
-    public void updateMarine(SpaceMarineDTO marine) throws NotFoundException {
+    public void updateMarine(SpaceMarineDTO marine, String editorUsername) throws NotFoundException {
         // TODO: add record to 'changes' table
 
         Optional<SpaceMarineDAO> marineOptional = spaceMarineRepository.findById(marine.getId());
@@ -68,7 +63,13 @@ public class SpaceMarineService {
         }
         SpaceMarineDAO updatedMarine = SpaceMarineDTO.toDAO(marine);
         updatedMarine.setUser(marineOptional.get().getUser());
+
         spaceMarineRepository.save(updatedMarine);
+
+        System.out.println("TRIGGERING HISTORY");
+        UserDAO editor = userRepository.findByUsername(editorUsername)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        newHistoryRecord(updatedMarine, editor);
     }
 
     public void newMarine(SpaceMarineDTO spaceMarineDTO, String owner) throws UserNotFoundException {
@@ -144,6 +145,25 @@ public class SpaceMarineService {
             aggregated.put(weapon.getName(), marines);
         }
         return aggregated;
+    }
+
+    public void newHistoryRecord(SpaceMarineDAO marine, UserDAO editor) {
+        EditHistoryDAO record = new EditHistoryDAO();
+        record.setMarine(marine);
+        record.setEditDate(LocalDate.now());
+        record.setUser(editor);
+
+        System.out.println("SAVING TO HISTORY: " + record);
+
+        editHistoryRepository.save(record);
+    }
+
+    public List<EditHistoryDTO> getEditHistoryByMarineId(Long marineId) {
+        return editHistoryRepository.findAllByMarineId(marineId)
+                .stream()
+                .map(EditHistoryDTO::fromDAO)
+                .toList();
+
     }
 
     public int countMarinesWithHeight(Long height) {

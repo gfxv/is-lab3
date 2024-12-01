@@ -1,5 +1,6 @@
 package dev.gfxv.lab1.controller;
 
+import com.nimbusds.jose.util.JSONObjectUtils;
 import dev.gfxv.lab1.JwtParser;
 import dev.gfxv.lab1.dao.enums.MeleeWeapon;
 import dev.gfxv.lab1.dao.enums.Weapon;
@@ -12,10 +13,8 @@ import dev.gfxv.lab1.security.JwtProvider;
 import dev.gfxv.lab1.service.SpaceMarineService;
 import dev.gfxv.lab1.service.UserService;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheAutoConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -120,10 +119,14 @@ public class SpaceMarineController {
 
     @PutMapping()
     public ResponseEntity<?> updateMarine(
+        @RequestHeader("Authorization") String tokenHeader,
         @RequestBody SpaceMarineDTO spaceMarineDTO
     ) {
+        String token = JwtParser.parseTokenFromHeader(tokenHeader);
+        String username = jwtProvider.getUsernameFromJwt(token);
+
         try {
-            spaceMarineService.updateMarine(spaceMarineDTO);
+            spaceMarineService.updateMarine(spaceMarineDTO, username);
         } catch (NotFoundException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         }
@@ -163,6 +166,19 @@ public class SpaceMarineController {
         try {
             Long id = Long.parseLong(marineId);
             return new ResponseEntity<>(userService.validateDeletePermission(username, id), HttpStatus.OK);
+        } catch (NumberFormatException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/history/{marineId}")
+    public ResponseEntity<?> getHistory(@PathVariable String marineId) {
+        try {
+            Long id = Long.parseLong(marineId);
+            System.out.println(marineId);
+            var history = spaceMarineService.getEditHistoryByMarineId(id);
+            System.out.println(history);
+            return new ResponseEntity<>(history, HttpStatus.OK);
         } catch (NumberFormatException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
