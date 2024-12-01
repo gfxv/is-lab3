@@ -175,9 +175,7 @@ public class SpaceMarineController {
     public ResponseEntity<?> getHistory(@PathVariable String marineId) {
         try {
             Long id = Long.parseLong(marineId);
-            System.out.println(marineId);
             var history = spaceMarineService.getEditHistoryByMarineId(id);
-            System.out.println(history);
             return new ResponseEntity<>(history, HttpStatus.OK);
         } catch (NumberFormatException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);

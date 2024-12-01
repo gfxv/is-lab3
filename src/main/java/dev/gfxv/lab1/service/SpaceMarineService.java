@@ -66,16 +66,12 @@ public class SpaceMarineService {
 
         spaceMarineRepository.save(updatedMarine);
 
-        System.out.println("TRIGGERING HISTORY");
         UserDAO editor = userRepository.findByUsername(editorUsername)
                 .orElseThrow(() -> new NotFoundException("User not found"));
         newHistoryRecord(updatedMarine, editor);
     }
 
     public void newMarine(SpaceMarineDTO spaceMarineDTO, String owner) throws UserNotFoundException {
-        final String op = "SpaceMarineService";
-        System.out.printf("[%s] Received: %s\n", op, spaceMarineDTO);
-
         SpaceMarineDAO spaceMarine = SpaceMarineDTO.toDAO(spaceMarineDTO);
         spaceMarine.setCreationDate(LocalDate.now());
 
@@ -152,9 +148,6 @@ public class SpaceMarineService {
         record.setMarine(marine);
         record.setEditDate(LocalDate.now());
         record.setUser(editor);
-
-        System.out.println("SAVING TO HISTORY: " + record);
-
         editHistoryRepository.save(record);
     }
 
