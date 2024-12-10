@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>dev.gfxv</groupId>
-    <artifactId>lab1</artifactId>
+    <artifactId>lab2</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Lab1</name>
-    <description>Lab1</description>
+    <name>Lab2</name>
+    <description>Lab2</description>
     <url/>
     <licenses>
         <license/>
