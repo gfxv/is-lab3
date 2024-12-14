@@ -10,12 +10,16 @@ import dev.gfxv.lab2.exceptions.NotFoundException;
 import dev.gfxv.lab2.exceptions.UserNotFoundException;
 import dev.gfxv.lab2.repository.*;
 import jakarta.transaction.Transactional;
+import jakarta.validation.*;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -29,6 +33,8 @@ public class SpaceMarineService {
     CoordinateRepository coordinateRepository;
     ChapterRepository chapterRepository;
     UserRepository userRepository;
+
+    Validator validator;
 
     String noChapterName = "No Chapter";
 
@@ -45,6 +51,9 @@ public class SpaceMarineService {
         this.coordinateRepository = coordinateRepository;
         this.chapterRepository = chapterRepository;
         this.userRepository = userRepository;
+
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        this.validator = factory.getValidator();
     }
 
     public SpaceMarineDTO getMarineById(Long id) throws NotFoundException {
@@ -77,7 +86,12 @@ public class SpaceMarineService {
         newHistoryRecord(updatedMarine, editor);
     }
 
-    public void newMarine(SpaceMarineDTO spaceMarineDTO, String owner) throws UserNotFoundException {
+    public void newMarine(@Valid SpaceMarineDTO spaceMarineDTO, String owner) throws UserNotFoundException {
+        Set<ConstraintViolation<SpaceMarineDTO>> violations = validator.validate(spaceMarineDTO);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
         SpaceMarineDAO spaceMarine = SpaceMarineDTO.toDAO(spaceMarineDTO);
         spaceMarine.setCreationDate(LocalDate.now());
 

@@ -1,6 +1,9 @@
 package dev.gfxv.lab2.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.gfxv.lab2.dao.CoordinatesDAO;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +16,18 @@ public class CoordinatesDTO {
     Long id;
     Integer x;
     Long y;
+
+    @JsonCreator
+    public static CoordinatesDTO create(
+            @JsonProperty("x") Integer x,
+            @JsonProperty("y") Long y
+    ) {
+        return CoordinatesDTO.builder()
+                .id(null)
+                .x(x)
+                .y(y)
+                .build();
+    }
 
     public static CoordinatesDTO fromDAO(CoordinatesDAO coordinatesDAO){
         return CoordinatesDTO.builder()
