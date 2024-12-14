@@ -1,6 +1,6 @@
 package dev.gfxv.lab2.controller;
 
-import dev.gfxv.lab2.JwtParser;
+import dev.gfxv.lab2.utils.JwtParser;
 import dev.gfxv.lab2.dao.enums.MeleeWeapon;
 import dev.gfxv.lab2.dao.enums.Weapon;
 import dev.gfxv.lab2.dto.SpaceMarineDTO;

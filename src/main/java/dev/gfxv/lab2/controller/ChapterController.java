@@ -1,6 +1,6 @@
 package dev.gfxv.lab2.controller;
 
-import dev.gfxv.lab2.JwtParser;
+import dev.gfxv.lab2.utils.JwtParser;
 import dev.gfxv.lab2.dto.ChapterDTO;
 import dev.gfxv.lab2.exceptions.UserNotFoundException;
 import dev.gfxv.lab2.security.JwtProvider;

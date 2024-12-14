@@ -1,6 +1,6 @@
 package dev.gfxv.lab2.controller;
 
-import dev.gfxv.lab2.JwtParser;
+import dev.gfxv.lab2.utils.JwtParser;
 import dev.gfxv.lab2.dto.AdminRequestDTO;
 import dev.gfxv.lab2.security.JwtProvider;
 import dev.gfxv.lab2.service.AdminService;
