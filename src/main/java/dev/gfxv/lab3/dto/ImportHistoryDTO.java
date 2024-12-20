@@ -16,6 +16,7 @@ public class ImportHistoryDTO {
     Integer rowsAdded;
     String status;
     UserDTO user;
+    String minioFilename;
 
     public static ImportHistoryDTO fromDAO(ImportHistoryDAO importHistoryDAO){
         return ImportHistoryDTO.builder()
@@ -23,6 +24,7 @@ public class ImportHistoryDTO {
                 .status(importHistoryDAO.getStatus())
                 .rowsAdded(importHistoryDAO.getRowsAdded())
                 .user(UserDTO.fromDAO(importHistoryDAO.getUser()))
+                .minioFilename(importHistoryDAO.getMinioFilename())
                 .build();
     }
 
@@ -33,6 +35,9 @@ public class ImportHistoryDTO {
         }
         dao.setStatus(dto.getStatus());
         dao.setRowsAdded(dto.getRowsAdded());
+        if (dto.getMinioFilename() != null) {
+            dao.setMinioFilename(dto.getMinioFilename());
+        }
         return dao;
     }
 }

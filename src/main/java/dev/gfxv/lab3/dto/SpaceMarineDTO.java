@@ -29,7 +29,6 @@ public class SpaceMarineDTO {
 
     Integer health;
 
-    @Max(value = 250, message = "Marine's height must be less than 250")
     Long height;
 
     Weapon weapon;

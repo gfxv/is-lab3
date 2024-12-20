@@ -32,4 +32,7 @@ public class ImportHistoryDAO {
     @ManyToOne
     @JoinColumn(name="imported_by", referencedColumnName = "id")
     UserDAO user;
+
+    @Column(name = "minio_filename", nullable = false, unique = true)
+    String minioFilename;
 }

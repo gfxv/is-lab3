@@ -8,6 +8,7 @@ import dev.gfxv.lab3.exceptions.InvalidArgumentException;
 import dev.gfxv.lab3.exceptions.UserNotFoundException;
 import dev.gfxv.lab3.repository.ImportHistoryRepository;
 import dev.gfxv.lab3.repository.UserRepository;
+import dev.gfxv.lab3.utils.YmlParser;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import lombok.AccessLevel;
@@ -16,7 +17,9 @@ import org.springframework.beans.MethodInvocationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -24,37 +27,51 @@ import java.util.List;
 public class ImportService {
 
     SpaceMarineService spaceMarineService;
+    StorageService storageService;
+
     ImportHistoryRepository importHistoryRepository;
     UserRepository userRepository;
 
     @Autowired
     public ImportService(
-            SpaceMarineService spaceMarineService,
+            SpaceMarineService spaceMarineService, StorageService storageService,
             ImportHistoryRepository importHistoryRepository,
             UserRepository userRepository
     ) {
         this.spaceMarineService = spaceMarineService;
+        this.storageService = storageService;
         this.importHistoryRepository = importHistoryRepository;
         this.userRepository = userRepository;
     }
 
+    /**
+     *
+     * @param file
+     * @param owner
+     * @return Id of record in import history table
+     * @throws UserNotFoundException
+     */
     @Transactional(rollbackOn = {
             UsernameNotFoundException.class,
             InvalidArgumentException.class,
             MethodInvocationException.class,
             ConstraintViolationException.class
     })
-    public void importMarines(List<SpaceMarineDTO> marines, String owner) throws UserNotFoundException {
+    public ImportHistoryDAO importMarinesFromFile(MultipartFile file, String owner) throws UserNotFoundException, IOException {
+        List<SpaceMarineDTO> marines = YmlParser.parseFile(file);
         for (var marine : marines) {
             spaceMarineService.newMarine(marine, owner);
         }
+        String storedFilename = storageService.uploadFile(file.getOriginalFilename(), file.getInputStream(), file.getContentType());
+
         UserDAO user = userRepository.findByUsername(owner)
                 .orElseThrow(() -> new UserNotFoundException("username not found"));
         ImportHistoryDAO importHistory = new ImportHistoryDAO();
         importHistory.setUser(user);
         importHistory.setRowsAdded(marines.size());
         importHistory.setStatus("COMPLETE");
-        importHistoryRepository.save(importHistory);
+        importHistory.setMinioFilename(storedFilename);
+        return importHistoryRepository.save(importHistory);
     }
 
     public List<ImportHistoryDTO> getALLImportHistory() {
